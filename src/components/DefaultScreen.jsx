@@ -1,4 +1,4 @@
-import noProjectImage from "../assets/noProjectImage.png";
+import noProjectImage from "../assets/no-projects.png";
 import Button from "./Button.jsx";
 
 export default function DefaultScreen() {
