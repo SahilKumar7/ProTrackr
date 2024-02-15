@@ -1,6 +1,23 @@
-import Input from "./Input";
+import { useRef } from "react";
+import Input from "./Input.jsx";
 
-export default function NewProject() {
+export default function NewProject({ onAddNewProject }) {
+  let title = useRef();
+  let description = useRef();
+  let dueDate = useRef();
+
+  function handleSave() {
+    let enteredTitle = title.current.value;
+    let enteredDescription = description.current.value;
+    let enteredDueDate = dueDate.current.value;
+
+    onAddNewProject({
+      title: enteredTitle,
+      description: enteredDescription,
+      dueDate: enteredDueDate,
+    });
+  }
+
   return (
     <div className="w-[35rem] mt-16">
       <menu className="flex items-center justify-end gap-4 my-4">
@@ -10,15 +27,18 @@ export default function NewProject() {
           </button>
         </li>
         <li>
-          <button className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950">
+          <button
+            onClick={handleSave}
+            className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950"
+          >
             Save
           </button>
         </li>
       </menu>
       <div>
-        <Input label={"Title"} type="text" />
-        <Input label={"Description"} isTextArea />
-        <Input label={"Due Date"} type="text" />
+        <Input ref={title} label={"Title"} type="text" />
+        <Input ref={description} label={"Description"} isTextArea />
+        <Input ref={dueDate} label={"Due Date"} type="date" />
       </div>
     </div>
   );
