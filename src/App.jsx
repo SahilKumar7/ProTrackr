@@ -1,7 +1,8 @@
 import { useState } from "react";
-import DefaultScreen from "./components/DefaultScreen";
-import NewProject from "./components/NewProject";
-import ProjectsSidebar from "./components/ProjectsSidebar";
+import DefaultScreen from "./components/DefaultScreen.jsx";
+import NewProject from "./components/NewProject.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+import SelectedProject from "./components/SelectedProject.jsx";
 
 function App() {
   const [projectsState, setProjectsState] = useState({
@@ -50,9 +51,11 @@ function App() {
     });
   }
 
-  console.log(projectsState);
+  const selectedProject = projectsState.projects.find(
+    (project) => project.id === projectsState.selectedProjectId
+  );
 
-  let content;
+  let content = <SelectedProject project={selectedProject} />;
 
   if (projectsState.selectedProjectId === undefined)
     content = <DefaultScreen onClickAddProject={handleProjectState} />;
@@ -70,6 +73,7 @@ function App() {
         projects={projectsState.projects}
         onClickAddProject={handleProjectState}
         onSelectProject={handleSelectProject}
+        selectedProjectId={projectsState.selectedProjectId}
       />
       {content}
     </main>
