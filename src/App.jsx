@@ -41,6 +41,15 @@ function App() {
     });
   }
 
+  function handleSelectProject(id) {
+    setProjectsState((prevState) => {
+      return {
+        ...prevState,
+        selectedProjectId: id,
+      };
+    });
+  }
+
   console.log(projectsState);
 
   let content;
@@ -58,8 +67,9 @@ function App() {
   return (
     <main className="h-screen my-8 flex gap-8">
       <ProjectsSidebar
-        onClickAddProject={handleProjectState}
         projects={projectsState.projects}
+        onClickAddProject={handleProjectState}
+        onSelectProject={handleSelectProject}
       />
       {content}
     </main>
