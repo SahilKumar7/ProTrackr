@@ -21,13 +21,16 @@ function App() {
 
   function handleAddProject(project) {
     setProjectsState((prevState) => {
+      const projectId = Math.random();
+
       const newProject = {
         ...project,
-        id: Math.random(),
+        id: projectId,
       };
 
       return {
         ...prevState,
+        selectedProjectId: undefined,
         projects: [...prevState.projects, newProject],
       };
     });
@@ -63,11 +66,37 @@ function App() {
     });
   }
 
+  function handleAddTask(taskText) {
+    setProjectsState((prevState) => {
+      const taskId = Math.random();
+
+      const newTask = {
+        text: taskText,
+        id: taskId,
+        projectId: prevState.selectedProjectId,
+      };
+
+      return {
+        ...prevState,
+        tasks: [newTask, ...prevState.tasks],
+      };
+    });
+  }
+
+  function handleDeleteTask() {}
+
   const selectedProject = projectsState.projects.find(
     (project) => project.id === projectsState.selectedProjectId
   );
 
-  let content = <SelectedProject project={selectedProject} onDeleteProject={handleDeleteProject} />;
+  let content = (
+    <SelectedProject
+      project={selectedProject}
+      onDeleteProject={handleDeleteProject}
+      onAddTask={handleAddTask}
+      onDeleteTask={handleDeleteTask}
+    />
+  );
 
   if (projectsState.selectedProjectId === undefined)
     content = <DefaultScreen onClickAddProject={handleProjectState} />;
