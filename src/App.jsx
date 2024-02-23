@@ -8,6 +8,7 @@ function App() {
   const [projectsState, setProjectsState] = useState({
     selectProject: undefined,
     projects: [],
+    tasks: []
   });
 
   function handleProjectState() {
@@ -83,7 +84,14 @@ function App() {
     });
   }
 
-  function handleDeleteTask() {}
+  function handleDeleteTask(taskId) {
+    setProjectsState((prevState) => {
+      return {
+        ...prevState,
+        tasks: prevState.tasks.filter((task) => task.id !== taskId),
+      };
+    });
+  }
 
   const selectedProject = projectsState.projects.find(
     (project) => project.id === projectsState.selectedProjectId
