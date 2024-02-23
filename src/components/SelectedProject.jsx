@@ -2,6 +2,7 @@ import Tasks from "./Tasks.jsx";
 
 export default function SelectedProject({
   project,
+  tasks,
   onDeleteProject,
   onAddTask,
   onDeleteTask,
@@ -31,7 +32,7 @@ export default function SelectedProject({
           {project.description}
         </p>
       </header>
-      <Tasks onAdd={onAddTask} onDelete={onDeleteTask} />
+      <Tasks tasks={tasks} onAdd={onAddTask} onDelete={onDeleteTask} />
     </div>
   );
 }
