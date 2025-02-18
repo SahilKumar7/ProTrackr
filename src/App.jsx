@@ -1,133 +1,74 @@
-import { useState } from "react";
-import DefaultScreen from "./components/DefaultScreen.jsx";
-import NewProject from "./components/NewProject.jsx";
-import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
-import SelectedProject from "./components/SelectedProject.jsx";
+import { useEffect } from "react";
+import { Toaster } from "sonner";
+import { FolderOpen } from "lucide-react";
+import useProjectStore from "./store/projectStore";
+import useThemeStore from "./store/themeStore";
+import useKeyboardShortcut from "./hooks/useKeyboardShortcut";
+import Sidebar from "./components/layout/Sidebar";
+import ProjectForm from "./components/project/ProjectForm";
+import ProjectHeader from "./components/project/ProjectHeader";
+import TaskList from "./components/task/TaskList";
+import EmptyState from "./components/ui/EmptyState";
+import { EMPTY_STATE } from "./lib/constants";
 
-function App() {
-  const [projectsState, setProjectsState] = useState({
-    selectProject: undefined,
-    projects: [],
-    tasks: []
-  });
+export default function App() {
+  const view = useProjectStore((s) => s.view);
+  const startAddProject = useProjectStore((s) => s.startAddProject);
+  const theme = useThemeStore((s) => s.theme);
+  const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
 
-  function handleProjectState() {
-    setProjectsState((prevState) => {
-      return {
-        ...prevState,
-        selectedProjectId: null,
-      };
-    });
-  }
+  useEffect(() => {
+    const resolved = resolvedTheme();
+    document.documentElement.classList.toggle("dark", resolved === "dark");
+  }, [theme, resolvedTheme]);
 
-  function handleAddProject(project) {
-    setProjectsState((prevState) => {
-      const projectId = Math.random();
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => {
+      if (useThemeStore.getState().theme === "system") {
+        document.documentElement.classList.toggle("dark", mql.matches);
+      }
+    };
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
 
-      const newProject = {
-        ...project,
-        id: projectId,
-      };
+  useKeyboardShortcut("n", startAddProject, { ctrl: true });
 
-      return {
-        ...prevState,
-        selectedProjectId: undefined,
-        projects: [...prevState.projects, newProject],
-      };
-    });
-  }
-
-  function handleCancelAddProject() {
-    setProjectsState((prevState) => {
-      return {
-        ...prevState,
-        selectedProjectId: undefined,
-      };
-    });
-  }
-
-  function handleSelectProject(id) {
-    setProjectsState((prevState) => {
-      return {
-        ...prevState,
-        selectedProjectId: id,
-      };
-    });
-  }
-
-  function handleDeleteProject() {
-    setProjectsState((prevState) => {
-      return {
-        ...prevState,
-        selectedProjectId: undefined,
-        projects: prevState.projects.filter(
-          (project) => project.id !== prevState.selectedProjectId
-        ),
-      };
-    });
-  }
-
-  function handleAddTask(taskText) {
-    setProjectsState((prevState) => {
-      const taskId = Math.random();
-
-      const newTask = {
-        text: taskText,
-        id: taskId,
-        projectId: prevState.selectedProjectId,
-      };
-
-      return {
-        ...prevState,
-        tasks: [newTask, ...prevState.tasks],
-      };
-    });
-  }
-
-  function handleDeleteTask(taskId) {
-    setProjectsState((prevState) => {
-      return {
-        ...prevState,
-        tasks: prevState.tasks.filter((task) => task.id !== taskId),
-      };
-    });
-  }
-
-  const selectedProject = projectsState.projects.find(
-    (project) => project.id === projectsState.selectedProjectId
-  );
-
-  let content = (
-    <SelectedProject
-      project={selectedProject}
-      onDeleteProject={handleDeleteProject}
-      onAddTask={handleAddTask}
-      onDeleteTask={handleDeleteTask}
-      tasks={projectsState.tasks}
-    />
-  );
-
-  if (projectsState.selectedProjectId === undefined)
-    content = <DefaultScreen onClickAddProject={handleProjectState} />;
-  else if (projectsState.selectedProjectId === null)
+  let content;
+  if (view === "form") {
+    content = <ProjectForm />;
+  } else if (view === "project") {
     content = (
-      <NewProject
-        onAddNewProject={handleAddProject}
-        onCancelAddProject={handleCancelAddProject}
-      />
+      <div className="w-full max-w-2xl mx-auto px-5 md:px-8 py-8 md:py-12">
+        <ProjectHeader />
+        <TaskList />
+      </div>
     );
+  } else {
+    content = (
+      <div className="flex items-center justify-center h-full">
+        <EmptyState
+          icon={FolderOpen}
+          title={EMPTY_STATE.noProjects.title}
+          description={EMPTY_STATE.noProjects.description}
+          actionLabel="Create New Project"
+          onAction={startAddProject}
+        />
+      </div>
+    );
+  }
 
   return (
-    <main className="h-screen my-8 flex gap-8">
-      <ProjectsSidebar
-        projects={projectsState.projects}
-        onClickAddProject={handleProjectState}
-        onSelectProject={handleSelectProject}
-        selectedProjectId={projectsState.selectedProjectId}
+    <div className="flex h-screen overflow-hidden bg-surface-alt">
+      <Sidebar />
+      <main className="flex-1 overflow-y-auto">{content}</main>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          className: "!bg-surface-card !text-text !border !border-border !shadow-lg",
+        }}
       />
-      {content}
-    </main>
+    </div>
   );
 }
-
-export default App;
