@@ -5,10 +5,9 @@ import useProjectStore from "../../store/projectStore";
 import { cn } from "../../lib/utils";
 
 export default function TaskItem({ task, dragRef, isDragging }) {
-  const selectedProjectId = useProjectStore((s) => s.selectedProjectId);
   const toggleTask = useProjectStore((s) => s.toggleTask);
   const deleteTask = useProjectStore((s) => s.deleteTask);
-  const updateTask = useProjectStore((s) => s.updateTask);
+  const editTask = useProjectStore((s) => s.editTask);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
@@ -24,7 +23,7 @@ export default function TaskItem({ task, dragRef, isDragging }) {
       toast.error("Task text cannot be empty");
       return;
     }
-    updateTask(selectedProjectId, task.id, trimmed);
+    editTask(task.id, trimmed);
     setIsEditing(false);
   }
 
@@ -51,7 +50,7 @@ export default function TaskItem({ task, dragRef, isDragging }) {
       </button>
 
       <button
-        onClick={() => toggleTask(selectedProjectId, task.id)}
+        onClick={() => toggleTask(task.id)}
         className={cn(
           "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
           task.completed
@@ -110,7 +109,7 @@ export default function TaskItem({ task, dragRef, isDragging }) {
             </button>
             <button
               onClick={() => {
-                deleteTask(selectedProjectId, task.id);
+                deleteTask(task.id);
                 toast.success("Task deleted");
               }}
               className="p-2 text-text-muted hover:text-danger hover:bg-danger-soft rounded-lg transition-colors"

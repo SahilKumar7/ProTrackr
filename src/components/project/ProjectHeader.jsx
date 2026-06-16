@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Trash2, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import useProjectStore from "../../store/projectStore";
@@ -9,11 +9,18 @@ import ConfirmDialog from "../ui/ConfirmDialog";
 
 export default function ProjectHeader() {
   const project = useProjectStore((s) => s.getSelectedProject());
-  const tasks = useProjectStore((s) =>
-    s.getTasksForProject(s.selectedProjectId),
-  );
+  const allTasks = useProjectStore((s) => s.tasks);
+  const selectedProjectId = useProjectStore((s) => s.selectedProjectId);
   const deleteProject = useProjectStore((s) => s.deleteProject);
   const confirmRef = useRef();
+
+  const tasks = useMemo(
+    () =>
+      allTasks
+        .filter((t) => t.projectId === selectedProjectId)
+        .sort((a, b) => a.order - b.order),
+    [allTasks, selectedProjectId],
+  );
 
   if (!project) return null;
 

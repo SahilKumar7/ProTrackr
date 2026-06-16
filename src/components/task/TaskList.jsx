@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { ClipboardList } from "lucide-react";
@@ -14,10 +15,16 @@ function SortableTask({ task, id }) {
 
 export default function TaskList() {
   const selectedProjectId = useProjectStore((s) => s.selectedProjectId);
-  const tasks = useProjectStore((s) =>
-    s.getTasksForProject(s.selectedProjectId),
-  );
+  const allTasks = useProjectStore((s) => s.tasks);
   const reorderTasks = useProjectStore((s) => s.reorderTasks);
+
+  const tasks = useMemo(
+    () =>
+      allTasks
+        .filter((t) => t.projectId === selectedProjectId)
+        .sort((a, b) => a.order - b.order),
+    [allTasks, selectedProjectId],
+  );
 
   function handleDragEnd(event) {
     const { source, target } = event.operation;
