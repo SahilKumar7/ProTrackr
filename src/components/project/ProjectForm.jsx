@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useProjectStore from "../../store/projectStore";
 import Input from "../ui/Input";
+import DatePicker from "../ui/DatePicker";
 import Button from "../ui/Button";
 import Modal from "../ui/Modal";
 
@@ -11,15 +12,14 @@ export default function ProjectForm() {
 
   const titleRef = useRef();
   const descriptionRef = useRef();
-  const dueDateRef = useRef();
   const modal = useRef();
 
+  const [dueDate, setDueDate] = useState("");
   const [errors, setErrors] = useState({});
 
   function handleSave() {
     const title = titleRef.current.value.trim();
     const description = descriptionRef.current.value.trim();
-    const dueDate = dueDateRef.current.value;
     const newErrors = {};
 
     if (!title) newErrors.title = "Title is required";
@@ -64,10 +64,10 @@ export default function ProjectForm() {
               placeholder="What's this project about?"
               error={errors.description}
             />
-            <Input
-              ref={dueDateRef}
+            <DatePicker
               label="Due Date"
-              type="date"
+              value={dueDate}
+              onChange={setDueDate}
               error={errors.dueDate}
             />
           </div>

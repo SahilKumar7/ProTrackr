@@ -20,6 +20,39 @@ export function formatDate(dateStr) {
   });
 }
 
+/**
+ * Convert a Date to a local `YYYY-MM-DD` string.
+ * Uses local getters (not toISOString) to avoid timezone off-by-one shifts.
+ * @param {Date} date
+ * @returns {string}
+ */
+export function toISODate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Whether two dates fall on the same calendar day.
+ * @param {Date} a
+ * @param {Date} b
+ * @returns {boolean}
+ */
+export function isSameDay(a, b) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+/** @returns {Date} Today at local midnight. */
+export function startOfToday() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
 /** @returns {string} A UUID v4 string */
 export function generateId() {
   return crypto.randomUUID();
